@@ -29,7 +29,7 @@ class WindowClass(QMainWindow, form_class):
         self.pushButton.clicked.connect(QCoreApplication.instance().quit)
         self.statusBar().showMessage(self.date.toString(Qt.DefaultLocaleLongDate))
         self.pushButton_2.clicked.connect(self.run)
-        self.table_cols = ['검색한 시간', '지역명','온도','날씨']
+        self.table_cols = ['검색한 시간', '지역명','온도','습도','날씨']
         self.tableWidget.horizontalHeader().setStretchLastSection(True)        
         
     def run(self):
@@ -52,6 +52,10 @@ class WindowClass(QMainWindow, form_class):
 
         col_idx = self.table_cols.index('온도')
         table_item = QtWidgets.QTableWidgetItem(self.temp)
+        self.tableWidget.setItem(row_idx,col_idx, table_item)
+        
+        col_idx = self.table_cols.index('습도')
+        table_item = QtWidgets.QTableWidgetItem(self.mos)
         self.tableWidget.setItem(row_idx,col_idx, table_item)
 
         col_idx = self.table_cols.index('날씨')
@@ -134,7 +138,7 @@ class WindowClass(QMainWindow, form_class):
         
         for item in r_item:
             if(item.get("category") == "REH"):
-                mos=item.get("fcstValue")#mos=습도
+                self.mos=item.get("fcstValue")#mos=습도
                 break
 
         weather_dic={0:"없음",1:"비",2:"짓눈개비",3:"눈",4:"소나기",5:"빗방울",6:"빗방울/눈날림",7:"눈날림"}
