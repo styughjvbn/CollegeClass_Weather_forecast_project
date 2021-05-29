@@ -20,9 +20,10 @@ class WindowClass(QMainWindow, form_class):
         self.setWindowIcon(QIcon('weather.png'))
         self.date = QDate.currentDate()
         self.initUI()
-        self.x=0
-        self.y=0
+        self.weather=" "
+        self.dt_now = datetime.datetime.now()
         self.keyword=" "
+        self.temp=" "
         
     def initUI(self):
         self.pushButton.clicked.connect(QCoreApplication.instance().quit)
@@ -33,30 +34,62 @@ class WindowClass(QMainWindow, form_class):
         
     def run(self):
         self.keyword=self.lineEdit.text()
-        if self.keyword=="상당구":
-            self.x=69
-            self.y=106
-        elif self.keyword=="서원구":
-            self.x=69
-            self.y=107
-        elif self.keyword=="흥덕구":
-            self.x=67
-            self.y=106
-        elif self.keyword=="청원구":
-            self.x=69
-            self.y=107
-        else:
-            print("없습니다. ")
+        self.set_key()
         self.set_table()
         
     def set_table(self):
-        dt_now = datetime.datetime.now()
-        date=str(dt_now.date())
+        #if data:
+        row_idx = self.tableWidget.rowCount()
+        self.tableWidget.insertRow(row_idx)
+            
+        col_idx = self.table_cols.index('검색한 시간')
+        table_item = QtWidgets.QTableWidgetItem(str(self.dt_now.hour)+":"+str(self.dt_now.minute))
+        self.tableWidget.setItem(row_idx,col_idx, table_item)
+        
+        col_idx = self.table_cols.index('지역명')
+        table_item = QtWidgets.QTableWidgetItem(self.keyword)
+        self.tableWidget.setItem(row_idx,col_idx, table_item)
+
+        col_idx = self.table_cols.index('온도')
+        table_item = QtWidgets.QTableWidgetItem(self.temp)
+        self.tableWidget.setItem(row_idx,col_idx, table_item)
+
+        col_idx = self.table_cols.index('날씨')
+        table_item = QtWidgets.QTableWidgetItem(self.weather)
+        self.tableWidget.setItem(row_idx,col_idx, table_item)
+
+
+        self.tableWidget.horizontalHeader().setStretchLastSection(False)
+        self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+            
+            #for col_idx in range(self.tableWidget.columnCount()):
+               # self.tableWidget.item(row_idx,col_idx).setTextAlignment(Qt.AlignCenter)
+            
+    def set_key(self):
+        if self.keyword=="상당구":
+            x=69
+            y=106
+        elif self.keyword=="서원구":
+            x=69
+            y=107
+        elif self.keyword=="흥덕구":
+            x=67
+            y=106
+        elif self.keyword=="청원구":
+            x=69
+            y=107
+        else:
+            print("없습니다. ")
+            x=00
+            y=00
+        
+        date=str(self.dt_now.date())
         year=date[:4]
         month=date[5:7]
         day=date[8:10]
         basedate=year+month+day
-        time=str(dt_now.time())
+        time=str(self.dt_now.time())
         hour=int(time[:2])
         minute=int(time[3:5])
         if minute<int(30) :
@@ -68,9 +101,9 @@ class WindowClass(QMainWindow, form_class):
         {
             "ServiceKey": unquote("b58MyDUhHqCfbct6sxlCYnyzG6uSiFf8ZDeZXXvrZHLQSYT3zSL3SbOehZ60ZiNiny%2BZpsMSN4PuC59%2BtHvH%2BQ%3D%3D"),
             "base_date": basedate,
-            "base_time": "0030",
-            "nx": self.x,
-            "ny": self.y,
+            "base_time": basetime,
+            "nx": x,
+            "ny": y,
             "numOfRows": "36",
             "pageNo": 1,
             "dataType": "JSON"
@@ -96,7 +129,7 @@ class WindowClass(QMainWindow, form_class):
         
         for item in r_item:
             if(item.get("category") == "T1H"):
-                temp=item.get("fcstValue")#temp=기온
+                self.temp=item.get("fcstValue")#temp=기온
                 break
         
         for item in r_item:
@@ -107,42 +140,12 @@ class WindowClass(QMainWindow, form_class):
         weather_dic={0:"없음",1:"비",2:"짓눈개비",3:"눈",4:"소나기",5:"빗방울",6:"빗방울/눈날림",7:"눈날림"}
         sky_dic={1:"맑음",3:"구름많음",4:"흐림"}
         if int(pty)==0:
-            weather=sky_dic.get(int(sky))
+            self.weather=sky_dic.get(int(sky))
         else:
-            weather=weather_dic.get(int(pty))
-        #if data:
-        row_idx = self.tableWidget.rowCount()
-        self.tableWidget.insertRow(row_idx)
-            
-        col_idx = self.table_cols.index('검색한 시간')
-        table_item = QtWidgets.QTableWidgetItem(str(dt_now.hour)+":"+str(dt_now.minute))
-        self.tableWidget.setItem(row_idx,col_idx, table_item)
-        
-        col_idx = self.table_cols.index('지역명')
-        table_item = QtWidgets.QTableWidgetItem(self.keyword)
-        self.tableWidget.setItem(row_idx,col_idx, table_item)
-
-        col_idx = self.table_cols.index('온도')
-        table_item = QtWidgets.QTableWidgetItem(temp)
-        self.tableWidget.setItem(row_idx,col_idx, table_item)
-
-        col_idx = self.table_cols.index('날씨')
-        table_item = QtWidgets.QTableWidgetItem(weather)
-        self.tableWidget.setItem(row_idx,col_idx, table_item)
-
-
-        self.tableWidget.horizontalHeader().setStretchLastSection(False)
-        self.tableWidget.resizeColumnsToContents()
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
-            
-            #for col_idx in range(self.tableWidget.columnCount()):
-               # self.tableWidget.item(row_idx,col_idx).setTextAlignment(Qt.AlignCenter)
+            self.weather=weather_dic.get(int(pty))
             
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     myWindow = WindowClass()
     myWindow.show()
     app.exec_()
-    
-
-    
