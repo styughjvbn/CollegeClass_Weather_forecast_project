@@ -174,13 +174,13 @@ class WindowClass(QMainWindow, form_class):
         a = self.tableWidget.item(row,2)
         b = self.tableWidget.item(row,4)
         a1 = a.text()
-        b1=a.text()
-        
-        if b1!="맑음"or b1!="구름많음" or b1!="흐림":
+        b1=b.text()
+
+        if b1!="맑음" and b1!="구름많음" and b1!="흐림":
             self.on_clicked2()
-        elif int(a1)>27:
+        elif int(a1)>=23:
             self.on_clicked()
-        elif int(a1)<10:
+        elif int(a1)<=10:
             self.on_clicked1()
         
     def set_table(self):
